@@ -2,7 +2,7 @@
 
 A Discord bot that tracks community-generated clips for brand campaigns run through clipping networks. See [`InitSpecs.md`](InitSpecs.md) for the full product specification.
 
-> **Status:** Phase 1 (foundation) complete. Domain model, data layer (EF Core + SQLite), the host, and Discord slash-command wiring are in place. A diagnostic `/ping` command verifies the pipeline; feature commands come in later phases — see *Build order* below.
+> **Status:** Phase 2 (onboarding) complete. On top of the Phase 1 foundation, CLIPWEB now has `/welcome`, a two-step `/survey` flow that builds the editor profile, welcome-on-join, and post-survey editor-role assignment. Campaign features come next — see *Build order* below.
 
 ## Tech stack
 
@@ -59,6 +59,12 @@ $env:Discord__Token = "<your-token>"
 | `ConnectionStrings:Default`  | SQLite connection string (default `clipweb.db`).     |
 | `Discord:Token`              | Bot token (set via secrets/env, never committed).    |
 | `Discord:DevGuildId`         | Guild id for fast dev command registration (0=global)|
+| `Onboarding:EditorRoleId`    | Role granted on survey completion (0 = disabled).    |
+| `Onboarding:WelcomeChannelId`| Channel for welcome-on-join (0 = DM the new member). |
+
+> **Privileged intent:** welcome-on-join and editor-role assignment use the
+> **Server Members Intent**. Enable it for your app under
+> *Discord Developer Portal → Bot → Privileged Gateway Intents*.
 
 ## Slash commands
 
@@ -71,9 +77,16 @@ Discord when the gateway connects:
 - `Discord:DevGuildId = 0` → commands register globally (can take up to an hour
   to propagate).
 
-The bot ships with a diagnostic **`/ping`** command that reports gateway latency.
-Without a configured token the host still runs (applying migrations) but stays
-offline.
+Current commands:
+
+- **`/ping`** – diagnostic; reports gateway latency.
+- **`/welcome`** – posts the official CLIPWEB welcome message.
+- **`/survey`** – two-step modal onboarding form (10 questions) that builds the
+  editor's profile and grants the editor role on completion.
+
+New members are also welcomed automatically on join (to `WelcomeChannelId`, or
+by DM). Without a configured token the host still runs (applying migrations) but
+stays offline.
 
 ## Database & migrations
 
@@ -97,7 +110,7 @@ dotnet ef database update `
 ## Build order (from the spec)
 
 1. **Foundation** – Discord client, slash commands, config, database, logging ✅ *done*
-2. **Onboarding** – welcome message, survey, editor profiles
+2. **Onboarding** – welcome message, survey, editor profiles ✅ *done*
 3. **Campaigns** – brand & campaign creation, listing, details
 4. **Submissions** – submit, review, approve/reject/revision
 5. **Published posts** – post URLs, platform, view tracking

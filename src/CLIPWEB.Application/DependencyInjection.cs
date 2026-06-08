@@ -1,3 +1,4 @@
+using CLIPWEB.Application.Onboarding;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CLIPWEB.Application;
@@ -11,8 +12,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // Placeholder: application services (survey flow, reporting, submission
-        // workflow) are registered here in later phases.
+        // Onboarding (Phase 2).
+        services.AddScoped<IEditorOnboardingService, EditorOnboardingService>();
+
         return services;
     }
 }

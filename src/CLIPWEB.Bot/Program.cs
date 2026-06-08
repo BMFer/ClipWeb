@@ -1,4 +1,5 @@
 using CLIPWEB.Application;
+using CLIPWEB.Application.Onboarding;
 using CLIPWEB.Bot.Configuration;
 using CLIPWEB.Bot.Services;
 using CLIPWEB.Infrastructure;
@@ -21,6 +22,10 @@ builder.Services.AddSerilog((services, lc) => lc
 builder.Services.Configure<DiscordOptions>(
     builder.Configuration.GetSection(DiscordOptions.SectionName));
 
+// Bind onboarding settings (editor role, welcome channel).
+builder.Services.Configure<OnboardingOptions>(
+    builder.Configuration.GetSection(OnboardingOptions.SectionName));
+
 // Data + application layers.
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
@@ -31,9 +36,12 @@ builder.Services.AddHostedService<DatabaseInitializer>();
 // Discord gateway client + interaction (slash command) service.
 builder.Services.AddSingleton(new DiscordSocketConfig
 {
-    GatewayIntents = GatewayIntents.Guilds,
+    // GuildMembers is privileged — enable it in the Discord developer portal.
+    // Needed for the welcome-on-join handler and for resolving guild users
+    // when assigning the editor role.
+    GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers,
     LogLevel = LogSeverity.Info,
-    AlwaysDownloadUsers = false
+    AlwaysDownloadUsers = true
 });
 builder.Services.AddSingleton(sp =>
     new DiscordSocketClient(sp.GetRequiredService<DiscordSocketConfig>()));
@@ -41,9 +49,10 @@ builder.Services.AddSingleton(sp => new InteractionService(
     sp.GetRequiredService<DiscordSocketClient>(),
     new InteractionServiceConfig { LogLevel = LogSeverity.Info, UseCompiledLambda = true }));
 
-// Register modules + dispatch interactions, then connect the gateway.
-// Order matters: the handler subscribes to gateway events before the bot logs in.
+// Register modules + dispatch interactions, post welcomes on join, then connect.
+// Order matters: handlers subscribe to gateway events before the bot logs in.
 builder.Services.AddHostedService<InteractionHandler>();
+builder.Services.AddHostedService<GuildMemberHandler>();
 builder.Services.AddHostedService<DiscordBotService>();
 
 var host = builder.Build();
