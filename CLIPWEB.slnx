@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CLIPWEB.Application/CLIPWEB.Application.csproj" />
+    <Project Path="src/CLIPWEB.Bot/CLIPWEB.Bot.csproj" />
+    <Project Path="src/CLIPWEB.Core/CLIPWEB.Core.csproj" />
+    <Project Path="src/CLIPWEB.Infrastructure/CLIPWEB.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CLIPWEB.Tests/CLIPWEB.Tests.csproj" />
+  </Folder>
+</Solution>
