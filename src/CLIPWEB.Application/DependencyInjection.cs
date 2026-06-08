@@ -1,5 +1,6 @@
 using CLIPWEB.Application.Campaigns;
 using CLIPWEB.Application.Onboarding;
+using CLIPWEB.Application.Submissions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CLIPWEB.Application;
@@ -18,6 +19,9 @@ public static class DependencyInjection
 
         // Brands & campaigns (Phase 3).
         services.AddScoped<ICampaignService, CampaignService>();
+
+        // Submissions (Phase 4).
+        services.AddScoped<ISubmissionService, SubmissionService>();
 
         return services;
     }

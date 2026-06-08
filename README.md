@@ -2,7 +2,7 @@
 
 A Discord bot that tracks community-generated clips for brand campaigns run through clipping networks. See [`InitSpecs.md`](InitSpecs.md) for the full product specification.
 
-> **Status:** Phase 3 (campaigns) complete. On top of onboarding, CLIPWEB now manages brands and campaigns: `/brand create`, `/campaign create`, `/campaign close`, `/campaign details`, and `/campaigns`, with manager-gated commands and autocomplete pickers. Submissions come next — see *Build order* below.
+> **Status:** Phase 4 (submissions) complete. Editors can now `/submit clip` to an active campaign, and managers work a review queue with `/submission review` and `/submission approve|reject|revision` (editors are DM'd the decision). Published-post tracking comes next — see *Build order* below.
 
 ## Tech stack
 
@@ -89,6 +89,11 @@ Current commands:
 - **`/campaign details`** – shows a campaign (brand, dates, source, style guide).
 - **`/brand create`** · **`/campaign create`** · **`/campaign close`** – manager
   commands; `create`/`close` use autocomplete to pick the brand/campaign.
+- **`/submit clip`** – editors submit a clip (with URL validation) to an active
+  campaign; creates the editor profile on first use.
+- **`/submission review`** – manager review queue of pending submissions.
+- **`/submission approve|reject|revision`** – manager decisions (autocomplete
+  the pending submission); the editor is DM'd the outcome and any reviewer note.
 
 New members are also welcomed automatically on join (to `WelcomeChannelId`, or
 by DM). Without a configured token the host still runs (applying migrations) but
@@ -127,7 +132,7 @@ dotnet ef database update `
 1. **Foundation** – Discord client, slash commands, config, database, logging ✅ *done*
 2. **Onboarding** – welcome message, survey, editor profiles ✅ *done*
 3. **Campaigns** – brand & campaign creation, listing, details ✅ *done*
-4. **Submissions** – submit, review, approve/reject/revision
+4. **Submissions** – submit, review, approve/reject/revision ✅ *done*
 5. **Published posts** – post URLs, platform, view tracking
 6. **Reporting** – editor & campaign stats, admin reports
 
