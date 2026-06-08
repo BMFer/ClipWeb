@@ -1,4 +1,5 @@
 using CLIPWEB.Application;
+using CLIPWEB.Application.Authorization;
 using CLIPWEB.Application.Onboarding;
 using CLIPWEB.Bot.Configuration;
 using CLIPWEB.Bot.Services;
@@ -25,6 +26,10 @@ builder.Services.Configure<DiscordOptions>(
 // Bind onboarding settings (editor role, welcome channel).
 builder.Services.Configure<OnboardingOptions>(
     builder.Configuration.GetSection(OnboardingOptions.SectionName));
+
+// Bind management role mapping (admin / network manager).
+builder.Services.Configure<RolesOptions>(
+    builder.Configuration.GetSection(RolesOptions.SectionName));
 
 // Data + application layers.
 builder.Services.AddInfrastructure(builder.Configuration);

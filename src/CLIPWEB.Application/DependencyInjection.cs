@@ -1,3 +1,4 @@
+using CLIPWEB.Application.Campaigns;
 using CLIPWEB.Application.Onboarding;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,9 @@ public static class DependencyInjection
     {
         // Onboarding (Phase 2).
         services.AddScoped<IEditorOnboardingService, EditorOnboardingService>();
+
+        // Brands & campaigns (Phase 3).
+        services.AddScoped<ICampaignService, CampaignService>();
 
         return services;
     }

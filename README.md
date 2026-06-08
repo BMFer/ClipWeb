@@ -2,7 +2,7 @@
 
 A Discord bot that tracks community-generated clips for brand campaigns run through clipping networks. See [`InitSpecs.md`](InitSpecs.md) for the full product specification.
 
-> **Status:** Phase 2 (onboarding) complete. On top of the Phase 1 foundation, CLIPWEB now has `/welcome`, a two-step `/survey` flow that builds the editor profile, welcome-on-join, and post-survey editor-role assignment. Campaign features come next — see *Build order* below.
+> **Status:** Phase 3 (campaigns) complete. On top of onboarding, CLIPWEB now manages brands and campaigns: `/brand create`, `/campaign create`, `/campaign close`, `/campaign details`, and `/campaigns`, with manager-gated commands and autocomplete pickers. Submissions come next — see *Build order* below.
 
 ## Tech stack
 
@@ -61,6 +61,8 @@ $env:Discord__Token = "<your-token>"
 | `Discord:DevGuildId`         | Guild id for fast dev command registration (0=global)|
 | `Onboarding:EditorRoleId`    | Role granted on survey completion (0 = disabled).    |
 | `Onboarding:WelcomeChannelId`| Channel for welcome-on-join (0 = DM the new member). |
+| `Roles:AdminRoleId`          | Role treated as Admin for manager commands (0 = off).|
+| `Roles:NetworkManagerRoleId` | Role treated as Network Manager (0 = off).           |
 
 > **Privileged intent:** welcome-on-join and editor-role assignment use the
 > **Server Members Intent**. Enable it for your app under
@@ -83,10 +85,23 @@ Current commands:
 - **`/welcome`** – posts the official CLIPWEB welcome message.
 - **`/survey`** – two-step modal onboarding form (10 questions) that builds the
   editor's profile and grants the editor role on completion.
+- **`/campaigns`** – lists the active campaigns.
+- **`/campaign details`** – shows a campaign (brand, dates, source, style guide).
+- **`/brand create`** · **`/campaign create`** · **`/campaign close`** – manager
+  commands; `create`/`close` use autocomplete to pick the brand/campaign.
 
 New members are also welcomed automatically on join (to `WelcomeChannelId`, or
 by DM). Without a configured token the host still runs (applying migrations) but
 stays offline.
+
+### Manager commands & permissions
+
+Brand/campaign management is gated by `[RequireManager]`: a user passes if they
+have the Discord **Manage Server** permission **or** hold a configured
+`Roles:AdminRoleId` / `Roles:NetworkManagerRoleId`. Failures reply with an
+ephemeral "you need permission" message. (The check is enforced at runtime
+rather than via Discord's hard command-visibility gate, so configured-role users
+without Manage Server can still use the commands.)
 
 ## Database & migrations
 
@@ -111,7 +126,7 @@ dotnet ef database update `
 
 1. **Foundation** – Discord client, slash commands, config, database, logging ✅ *done*
 2. **Onboarding** – welcome message, survey, editor profiles ✅ *done*
-3. **Campaigns** – brand & campaign creation, listing, details
+3. **Campaigns** – brand & campaign creation, listing, details ✅ *done*
 4. **Submissions** – submit, review, approve/reject/revision
 5. **Published posts** – post URLs, platform, view tracking
 6. **Reporting** – editor & campaign stats, admin reports

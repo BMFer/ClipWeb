@@ -98,7 +98,16 @@ public class InteractionHandler : IHostedService
             // scoped services (e.g. repositories / DbContext).
             using var scope = _services.CreateScope();
             var context = new SocketInteractionContext(_client, interaction);
-            await _interactions.ExecuteCommandAsync(context, scope.ServiceProvider);
+            var result = await _interactions.ExecuteCommandAsync(context, scope.ServiceProvider);
+
+            // A failed precondition (e.g. not a manager) never runs the command
+            // body, so surface the reason to the user ourselves.
+            if (!result.IsSuccess &&
+                result.Error == InteractionCommandError.UnmetPrecondition &&
+                !interaction.HasResponded)
+            {
+                await interaction.RespondAsync(result.ErrorReason, ephemeral: true);
+            }
         }
         catch (Exception ex)
         {
