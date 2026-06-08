@@ -91,6 +91,25 @@ public class SubmissionService : ISubmissionService
         return (await BuildSummariesAsync([submission], ct)).Single();
     }
 
+    public async Task<IReadOnlyList<SubmissionSummary>> GetApprovedForEditorAsync(
+        ulong discordUserId, string? query = null, int take = 25, CancellationToken ct = default)
+    {
+        var editor = (await _editors.ListAsync(e => e.DiscordUserId == discordUserId, ct)).FirstOrDefault();
+        if (editor is null)
+            return [];
+
+        var approved = await _submissions.ListAsync(
+            s => s.EditorProfileId == editor.Id && s.Status == SubmissionStatus.Approved, ct);
+
+        var summaries = await BuildSummariesAsync(approved, ct);
+        if (!string.IsNullOrWhiteSpace(query))
+            summaries = summaries
+                .Where(s => s.CampaignName.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+        return summaries.Take(take).ToList();
+    }
+
     private async Task<List<SubmissionSummary>> BuildSummariesAsync(
         IReadOnlyList<ClipSubmission> submissions, CancellationToken ct)
     {

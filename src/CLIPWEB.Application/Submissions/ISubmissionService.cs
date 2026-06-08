@@ -28,4 +28,11 @@ public interface ISubmissionService
     /// <summary>Sets a submission's status; returns the updated view, or null if not found.</summary>
     Task<SubmissionSummary?> SetStatusAsync(
         Guid submissionId, SubmissionStatus status, CancellationToken ct = default);
+
+    /// <summary>
+    /// An editor's own approved submissions (for adding published posts),
+    /// optionally filtered by a query against the campaign name.
+    /// </summary>
+    Task<IReadOnlyList<SubmissionSummary>> GetApprovedForEditorAsync(
+        ulong discordUserId, string? query = null, int take = 25, CancellationToken ct = default);
 }

@@ -2,7 +2,7 @@
 
 A Discord bot that tracks community-generated clips for brand campaigns run through clipping networks. See [`InitSpecs.md`](InitSpecs.md) for the full product specification.
 
-> **Status:** Phase 4 (submissions) complete. Editors can now `/submit clip` to an active campaign, and managers work a review queue with `/submission review` and `/submission approve|reject|revision` (editors are DM'd the decision). Published-post tracking comes next — see *Build order* below.
+> **Status:** Phase 5 (published posts) complete. Editors can now `/submit post` to log a published social post against one of their own approved clips — platform, URL, views, and optional likes/comments/shares. Reporting is the last MVP phase — see *Build order* below.
 
 ## Tech stack
 
@@ -91,6 +91,9 @@ Current commands:
   commands; `create`/`close` use autocomplete to pick the brand/campaign.
 - **`/submit clip`** – editors submit a clip (with URL validation) to an active
   campaign; creates the editor profile on first use.
+- **`/submit post`** – editors log a published post (platform, URL, views, and
+  optional likes/comments/shares) against one of their **own approved** clips
+  (autocomplete is scoped to the caller's approved submissions).
 - **`/submission review`** – manager review queue of pending submissions.
 - **`/submission approve|reject|revision`** – manager decisions (autocomplete
   the pending submission); the editor is DM'd the outcome and any reviewer note.
@@ -133,7 +136,7 @@ dotnet ef database update `
 2. **Onboarding** – welcome message, survey, editor profiles ✅ *done*
 3. **Campaigns** – brand & campaign creation, listing, details ✅ *done*
 4. **Submissions** – submit, review, approve/reject/revision ✅ *done*
-5. **Published posts** – post URLs, platform, view tracking
+5. **Published posts** – post URLs, platform, view tracking ✅ *done*
 6. **Reporting** – editor & campaign stats, admin reports
 
 See `InitSpecs.md` §12 for details.

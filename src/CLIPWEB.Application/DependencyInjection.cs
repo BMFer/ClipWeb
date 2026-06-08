@@ -23,6 +23,9 @@ public static class DependencyInjection
         // Submissions (Phase 4).
         services.AddScoped<ISubmissionService, SubmissionService>();
 
+        // Published posts (Phase 5).
+        services.AddScoped<IPublishedPostService, PublishedPostService>();
+
         return services;
     }
 }
