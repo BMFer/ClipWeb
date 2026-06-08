@@ -1,5 +1,6 @@
 using CLIPWEB.Application.Campaigns;
 using CLIPWEB.Application.Onboarding;
+using CLIPWEB.Application.Reporting;
 using CLIPWEB.Application.Submissions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,6 +26,9 @@ public static class DependencyInjection
 
         // Published posts (Phase 5).
         services.AddScoped<IPublishedPostService, PublishedPostService>();
+
+        // Reporting (Phase 6).
+        services.AddScoped<IReportingService, ReportingService>();
 
         return services;
     }
