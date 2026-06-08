@@ -3,6 +3,7 @@ using System;
 using CLIPWEB.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CLIPWEB.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ClipWebDbContext))]
-    partial class ClipWebDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608184730_AddReviewFeedbackToClipSubmission")]
+    partial class AddReviewFeedbackToClipSubmission
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.8");

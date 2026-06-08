@@ -42,6 +42,11 @@ public class PublishedPostService : IPublishedPostService
         if (submission.Status != SubmissionStatus.Approved)
             throw new InvalidOperationException("Only approved clips can have published posts added.");
 
+        // Reject a post URL that's already been logged anywhere.
+        var loweredUrl = postUrl.ToLower();
+        if ((await _posts.ListAsync(p => p.PostUrl.ToLower() == loweredUrl, ct)).Any())
+            throw new InvalidOperationException("That post URL has already been logged.");
+
         var now = DateTime.UtcNow;
         var post = new PublishedPost
         {

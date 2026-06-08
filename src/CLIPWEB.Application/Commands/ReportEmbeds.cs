@@ -47,6 +47,27 @@ internal static class ReportEmbeds
         .AddField("Top campaign", Leader(b.TopCampaignName, b.TopCampaignViews), inline: true)
         .Build();
 
+    public static Embed Leaderboard(IReadOnlyList<LeaderboardEntry> entries)
+    {
+        var lines = entries.Select(e =>
+            $"{Medal(e.Rank)} **{e.Rank}.** {e.EditorName} — {e.TotalViews:N0} views ({e.Posts:N0} posts)");
+
+        return new EmbedBuilder()
+            .WithTitle("🏆 Editor leaderboard")
+            .WithColor(Accent)
+            .WithDescription(string.Join('\n', lines))
+            .WithFooter("Ranked by total views generated.")
+            .Build();
+    }
+
+    private static string Medal(int rank) => rank switch
+    {
+        1 => "🥇",
+        2 => "🥈",
+        3 => "🥉",
+        _ => "▫️"
+    };
+
     private static string Percent(double rate) => $"{rate * 100:N0}%";
 
     private static string BestPost(string? url, long? views)

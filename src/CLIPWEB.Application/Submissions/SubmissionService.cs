@@ -35,6 +35,11 @@ public class SubmissionService : ISubmissionService
         if (!campaign.IsActive)
             throw new InvalidOperationException($"Campaign **{campaign.Name}** is closed and isn't accepting submissions.");
 
+        // Reject a clip URL that's already been submitted to this campaign.
+        var existing = await _submissions.ListAsync(s => s.CampaignId == campaign.Id, ct);
+        if (existing.Any(s => string.Equals(s.ClipUrl, clipUrl, StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException("That clip has already been submitted to this campaign.");
+
         var editor = await _onboarding.GetOrCreateProfileAsync(discordUserId, discordUsername, ct);
 
         var submission = new ClipSubmission
@@ -78,13 +83,17 @@ public class SubmissionService : ISubmissionService
     }
 
     public async Task<SubmissionSummary?> SetStatusAsync(
-        Guid submissionId, SubmissionStatus status, CancellationToken ct = default)
+        Guid submissionId, SubmissionStatus status,
+        string? reviewerNote = null, ulong? reviewerDiscordUserId = null, CancellationToken ct = default)
     {
         var submission = (await _submissions.ListAsync(s => s.Id == submissionId, ct)).FirstOrDefault();
         if (submission is null)
             return null;
 
         submission.Status = status;
+        submission.ReviewerNote = string.IsNullOrWhiteSpace(reviewerNote) ? null : reviewerNote.Trim();
+        submission.ReviewedAtUtc = DateTime.UtcNow;
+        submission.ReviewedByDiscordUserId = reviewerDiscordUserId;
         _submissions.Update(submission);
         await _submissions.SaveChangesAsync(ct);
 

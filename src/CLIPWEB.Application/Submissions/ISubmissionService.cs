@@ -25,9 +25,13 @@ public interface ISubmissionService
     Task<IReadOnlyList<SubmissionSummary>> SearchPendingAsync(
         string? query, int take = 25, CancellationToken ct = default);
 
-    /// <summary>Sets a submission's status; returns the updated view, or null if not found.</summary>
+    /// <summary>
+    /// Sets a submission's status and records the reviewer feedback; returns the
+    /// updated view, or null if not found.
+    /// </summary>
     Task<SubmissionSummary?> SetStatusAsync(
-        Guid submissionId, SubmissionStatus status, CancellationToken ct = default);
+        Guid submissionId, SubmissionStatus status,
+        string? reviewerNote = null, ulong? reviewerDiscordUserId = null, CancellationToken ct = default);
 
     /// <summary>
     /// An editor's own approved submissions (for adding published posts),

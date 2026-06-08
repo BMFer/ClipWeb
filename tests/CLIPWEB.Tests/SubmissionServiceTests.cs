@@ -165,5 +165,44 @@ public class SubmissionServiceTests : IDisposable
             Assert.Null(await svc.SetStatusAsync(Guid.NewGuid(), SubmissionStatus.Approved));
     }
 
+    [Fact]
+    public async Task SetStatus_persists_reviewer_feedback()
+    {
+        var campaignId = await SeedCampaignAsync();
+        Guid submissionId;
+        var submit = NewService(out var ctx1);
+        using (ctx1)
+            submissionId = (await submit.SubmitClipAsync(7UL, "clipper", campaignId, "https://example.com/clip", null)).Id;
+
+        var review = NewService(out var ctx2);
+        using (ctx2)
+            await review.SetStatusAsync(submissionId, SubmissionStatus.NeedsRevision, "Tighten the intro", 99UL);
+
+        using var verify = CreateContext();
+        var saved = await verify.ClipSubmissions.SingleAsync();
+        Assert.Equal(SubmissionStatus.NeedsRevision, saved.Status);
+        Assert.Equal("Tighten the intro", saved.ReviewerNote);
+        Assert.Equal(99UL, saved.ReviewedByDiscordUserId);
+        Assert.NotNull(saved.ReviewedAtUtc);
+    }
+
+    [Fact]
+    public async Task SubmitClip_rejects_duplicate_url_in_same_campaign()
+    {
+        var campaignId = await SeedCampaignAsync();
+
+        var first = NewService(out var ctx1);
+        using (ctx1)
+            await first.SubmitClipAsync(7UL, "clipper", campaignId, "https://example.com/clip", null);
+
+        var second = NewService(out var ctx2);
+        using (ctx2)
+        {
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                second.SubmitClipAsync(8UL, "other", campaignId, "HTTPS://EXAMPLE.COM/CLIP", null));
+            Assert.Contains("already been submitted", ex.Message, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
     public void Dispose() => _connection.Dispose();
 }

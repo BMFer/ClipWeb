@@ -45,3 +45,6 @@ public record BrandSummary(
 
 /// <summary>An editor choice for autocomplete (value = profile id).</summary>
 public record EditorOption(Guid EditorProfileId, string Name);
+
+/// <summary>A ranked entry in the editor leaderboard.</summary>
+public record LeaderboardEntry(int Rank, string EditorName, long TotalViews, int Posts);

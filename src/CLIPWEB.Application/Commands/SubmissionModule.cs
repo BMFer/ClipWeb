@@ -83,7 +83,8 @@ public class SubmissionModule : InteractionModuleBase<SocketInteractionContext>
             return;
         }
 
-        var result = await _submissions.SetStatusAsync(submissionId, status);
+        var result = await _submissions.SetStatusAsync(
+            submissionId, status, note, Context.User.Id);
         if (result is null)
         {
             await RespondAsync("That submission could not be found.", ephemeral: true);

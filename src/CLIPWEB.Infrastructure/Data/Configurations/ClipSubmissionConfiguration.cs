@@ -11,6 +11,7 @@ public class ClipSubmissionConfiguration : IEntityTypeConfiguration<ClipSubmissi
         builder.HasKey(s => s.Id);
         builder.Property(s => s.ClipUrl).IsRequired().HasMaxLength(500);
         builder.Property(s => s.Notes).HasMaxLength(2000);
+        builder.Property(s => s.ReviewerNote).HasMaxLength(1000);
         builder.Property(s => s.Status)
             .HasConversion<string>()
             .HasMaxLength(20);

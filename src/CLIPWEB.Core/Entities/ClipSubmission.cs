@@ -15,6 +15,17 @@ public class ClipSubmission
     public SubmissionStatus Status { get; set; }
     public DateTime SubmittedAtUtc { get; set; }
 
+    // --- Review feedback (set when a manager acts on the submission) ---
+
+    /// <summary>The reviewer's note/reason, if one was given.</summary>
+    public string? ReviewerNote { get; set; }
+
+    /// <summary>When the submission was last reviewed.</summary>
+    public DateTime? ReviewedAtUtc { get; set; }
+
+    /// <summary>Discord id of the reviewer who last changed the status.</summary>
+    public ulong? ReviewedByDiscordUserId { get; set; }
+
     /// <summary>The campaign this clip was submitted to.</summary>
     public Campaign? Campaign { get; set; }
 

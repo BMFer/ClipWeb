@@ -21,4 +21,7 @@ public interface IReportingService
     /// <summary>Editors matching a query against their name (for autocomplete).</summary>
     Task<IReadOnlyList<EditorOption>> SearchEditorsAsync(
         string? query, int take = 25, CancellationToken ct = default);
+
+    /// <summary>Top editors ranked by total views generated.</summary>
+    Task<IReadOnlyList<LeaderboardEntry>> GetLeaderboardAsync(int take = 10, CancellationToken ct = default);
 }

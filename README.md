@@ -98,6 +98,11 @@ Current commands:
   views, avg views/post, best post, active campaigns).
 - **`/report editor`** · **`/report campaign`** · **`/report brand`** – manager
   reports aggregating clips, approvals, posts, views, and top performers.
+- **`/leaderboard`** – top editors ranked by total views generated.
+
+Reviewer decisions (`/submission approve|reject|revision`) persist the
+reviewer's note, timestamp, and reviewer id on the submission. Duplicate clip
+URLs (per campaign) and duplicate post URLs (globally) are rejected.
 - **`/submission review`** – manager review queue of pending submissions.
 - **`/submission approve|reject|revision`** – manager decisions (autocomplete
   the pending submission); the editor is DM'd the outcome and any reviewer note.

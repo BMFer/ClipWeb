@@ -13,6 +13,7 @@ namespace CLIPWEB.Tests;
 public class PublishedPostServiceTests : IDisposable
 {
     private readonly SqliteConnection _connection;
+    private int _clipSeq;
 
     public PublishedPostServiceTests()
     {
@@ -57,7 +58,7 @@ public class PublishedPostServiceTests : IDisposable
     {
         var svc = NewSubmissions(out var ctx);
         using (ctx)
-            return (await svc.SubmitClipAsync(userId, $"user{userId}", campaignId, "https://example.com/clip", null)).Id;
+            return (await svc.SubmitClipAsync(userId, $"user{userId}", campaignId, $"https://example.com/clip/{++_clipSeq}", null)).Id;
     }
 
     private async Task ApproveAsync(Guid submissionId)
@@ -121,6 +122,26 @@ public class PublishedPostServiceTests : IDisposable
             var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 posts.AddPostAsync(8UL, submissionId, "TikTok", "https://tiktok.com/p/1", 100, null, null, null));
             Assert.Contains("your own", ex.Message, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    [Fact]
+    public async Task AddPost_rejects_duplicate_post_url()
+    {
+        var campaignId = await SeedCampaignAsync();
+        var submissionId = await SubmitAsync(7UL, campaignId);
+        await ApproveAsync(submissionId);
+
+        var first = NewPosts(out var ctx1);
+        using (ctx1)
+            await first.AddPostAsync(7UL, submissionId, "TikTok", "https://tiktok.com/p/1", 100, null, null, null);
+
+        var second = NewPosts(out var ctx2);
+        using (ctx2)
+        {
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                second.AddPostAsync(7UL, submissionId, "TikTok", "https://TikTok.com/P/1", 200, null, null, null));
+            Assert.Contains("already been logged", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
     }
 

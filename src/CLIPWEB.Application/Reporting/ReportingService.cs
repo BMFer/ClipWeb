@@ -174,6 +174,39 @@ public class ReportingService : IReportingService
             .ToList();
     }
 
+    public async Task<IReadOnlyList<LeaderboardEntry>> GetLeaderboardAsync(int take = 10, CancellationToken ct = default)
+    {
+        var posts = await _posts.ListAsync(ct: ct);
+        if (posts.Count == 0)
+            return [];
+
+        var submissionIds = posts.Select(p => p.ClipSubmissionId).Distinct().ToList();
+        var subs = await _submissions.ListAsync(s => submissionIds.Contains(s.Id), ct);
+        var submissionToEditor = subs.ToDictionary(s => s.Id, s => s.EditorProfileId);
+
+        var ranked = posts
+            .Where(p => submissionToEditor.ContainsKey(p.ClipSubmissionId))
+            .GroupBy(p => submissionToEditor[p.ClipSubmissionId])
+            .Select(g => new { EditorId = g.Key, Views = g.Sum(p => p.Views), Posts = g.Count() })
+            .OrderByDescending(x => x.Views)
+            .ThenByDescending(x => x.Posts)
+            .Take(take)
+            .ToList();
+
+        var editorIds = ranked.Select(x => x.EditorId).ToList();
+        var editors = (await _editors.ListAsync(e => editorIds.Contains(e.Id), ct))
+            .ToDictionary(e => e.Id);
+
+        return ranked
+            .Select((x, i) =>
+            {
+                editors.TryGetValue(x.EditorId, out var editor);
+                var name = editor?.PreferredName ?? editor?.DiscordUsername ?? "Unknown editor";
+                return new LeaderboardEntry(i + 1, name, x.Views, x.Posts);
+            })
+            .ToList();
+    }
+
     private async Task<IReadOnlyList<PublishedPost>> PostsForSubmissionsAsync(
         IReadOnlyList<ClipSubmission> submissions, CancellationToken ct)
     {

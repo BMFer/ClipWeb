@@ -16,6 +16,7 @@ public class ReportingServiceTests : IDisposable
     private readonly SqliteConnection _connection;
     private Guid _brandId;
     private Guid _campaignId;
+    private int _clipSeq;
 
     public ReportingServiceTests()
     {
@@ -62,7 +63,7 @@ public class ReportingServiceTests : IDisposable
         var submissions = new SubmissionService(
             new EfRepository<ClipSubmission>(ctx), new EfRepository<Campaign>(ctx),
             new EfRepository<EditorProfile>(ctx), onboarding);
-        return (await submissions.SubmitClipAsync(userId, $"user{userId}", _campaignId, "https://example.com/clip", null)).Id;
+        return (await submissions.SubmitClipAsync(userId, $"user{userId}", _campaignId, $"https://example.com/clip/{++_clipSeq}", null)).Id;
     }
 
     private async Task ApproveAsync(Guid submissionId)
@@ -179,6 +180,24 @@ public class ReportingServiceTests : IDisposable
         var reporting = NewReporting(out var ctx);
         using (ctx)
             Assert.Null(await reporting.GetEditorStatsByDiscordIdAsync(404UL));
+    }
+
+    [Fact]
+    public async Task Leaderboard_ranks_editors_by_total_views()
+    {
+        await SeedScenarioAsync();
+
+        var reporting = NewReporting(out var ctx);
+        using (ctx)
+        {
+            var board = await reporting.GetLeaderboardAsync();
+            Assert.Equal(2, board.Count);
+            Assert.Equal(1, board[0].Rank);
+            Assert.Equal("Jamie", board[0].EditorName);   // 1000 views beats 500
+            Assert.Equal(1000, board[0].TotalViews);
+            Assert.Equal(2, board[1].Rank);
+            Assert.Equal(500, board[1].TotalViews);
+        }
     }
 
     [Fact]
